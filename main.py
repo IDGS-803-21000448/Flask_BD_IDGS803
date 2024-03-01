@@ -57,6 +57,48 @@ def alumnos():
                             form = alum_form,
                             nom=nom, apa=apa, ama=ama)
 
+@app.route("/eliminar", methods=["GET", "POST"])
+def eliminar():
+    alum_form = forms.UsersForm2(request.form)
+
+    if request.method == 'GET':
+        id = request.args.get('id')
+        aluml = db.session.query(Alumnos).filter(Alumnos.id == id).first()
+        alum_form.id.data = request.args.get('id')
+        alum_form.nombre.data = aluml.nombre
+        alum_form.apaterno.data = aluml.apaterno
+        alum_form.email.data = aluml.email
+    if request.method == "POST" and alum_form.validate():
+        id = alum_form.id.data
+        alum = Alumnos.query.get(id)
+        db.session.delete(alum)
+        db.session.commit()
+        return redirect('ABC_Completo')
+    return render_template("eliminar.html",
+                            form = alum_form,)
+
+@app.route("/modificar", methods=["GET", "POST"])
+def modificar():
+    alum_form = forms.UsersForm2(request.form)
+
+    if request.method == 'GET':
+        id = request.args.get('id')
+        aluml = db.session.query(Alumnos).filter(Alumnos.id == id).first()
+        alum_form.id.data = request.args.get('id')
+        alum_form.nombre.data = aluml.nombre
+        alum_form.apaterno.data = aluml.apaterno
+        alum_form.email.data = aluml.email
+    if request.method == "POST" and alum_form.validate():
+        id = alum_form.id.data
+        aluml = db.session.query(Alumnos).filter(Alumnos.id == id).first()
+        aluml.nombre = alum_form.nombre.data
+        aluml.apaterno = alum_form.apaterno.data
+        aluml.email =  alum_form.email.data
+        db.session.add(aluml)
+        db.session.commit()
+        return redirect('ABC_Completo')
+    return render_template("modificar.html",
+                            form = alum_form)
 
 if __name__ == "__main__":
     csrf.init_app(app)
